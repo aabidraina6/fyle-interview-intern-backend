@@ -23,3 +23,4 @@ def assert_valid(cond, msg='BAD_REQUEST'):
 def assert_found(_obj, msg='NOT_FOUND'):
     if _obj is None:
         base_assert(404, msg)
+

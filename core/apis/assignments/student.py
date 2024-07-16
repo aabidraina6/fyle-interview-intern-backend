@@ -3,6 +3,7 @@ from core import db
 from core.apis import decorators
 from core.apis.responses import APIResponse
 from core.models.assignments import Assignment
+from core.libs.exceptions import FyleError
 
 from .schema import AssignmentSchema, AssignmentSubmitSchema
 student_assignments_resources = Blueprint('student_assignments_resources', __name__)
@@ -24,6 +25,9 @@ def upsert_assignment(p, incoming_payload):
     """Create or Edit an assignment"""
     assignment = AssignmentSchema().load(incoming_payload)
     assignment.student_id = p.student_id
+
+    if not assignment.content:
+        raise FyleError(400 , "Content is required")
 
     upserted_assignment = Assignment.upsert(assignment)
     db.session.commit()

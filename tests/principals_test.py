@@ -34,16 +34,17 @@ def test_grade_assignment(client, h_principal):
     response = client.post(
         '/principal/assignments/grade',
         json={
-            'id': 4,
+            'id': 1,
             'grade': GradeEnum.C.value
         },
         headers=h_principal
     )
-
+    # print(response.status_code)
     assert response.status_code == 200
+    
 
     assert response.json['data']['state'] == AssignmentStateEnum.GRADED.value
-    assert response.json['data']['grade'] == GradeEnum.C
+    assert response.json['data']['grade'] == GradeEnum.C.value
 
 
 def test_regrade_assignment(client, h_principal):
@@ -52,11 +53,44 @@ def test_regrade_assignment(client, h_principal):
         json={
             'id': 4,
             'grade': GradeEnum.B.value
+
         },
         headers=h_principal
     )
+    print(response)
+
 
     assert response.status_code == 200
 
     assert response.json['data']['state'] == AssignmentStateEnum.GRADED.value
-    assert response.json['data']['grade'] == GradeEnum.B
+    assert response.json['data']['grade'] == GradeEnum.B.value
+
+
+# Test for grading an assignment with an invalid grade
+def test_grade_assignment_bad_grade(client, h_principal):
+    response = client.post(
+        '/principal/assignments/grade',
+        json={
+            "id": 1,
+            "grade": "AB"
+        },
+        headers=h_principal
+    )
+
+    assert response.status_code == 400
+    # assert response.json['error'] == 'FyleError'
+
+
+# Test for grading a non-existent assignment
+def test_grade_assignment_bad_assignment(client, h_principal):
+    response = client.post(
+        '/principal/assignments/grade',
+        headers=h_principal,
+        json={
+            "id": 100000,
+            "grade": "A"
+        }
+    )
+
+    assert response.status_code == 404
+    # assert response.json['error'] == 'FyleError'
